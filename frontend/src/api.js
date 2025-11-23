@@ -1,5 +1,33 @@
 const API_BASE = 'http://localhost:8080/api'
 
+export async function register(email, name, password) {
+  const res = await fetch(`${API_BASE}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, name, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  return res.json(); // { id, email, name }
+}
+
+export async function login(email, password) {
+  const res = await fetch(`${API_BASE}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  return res.json(); // { status:"ok", user:{...} }
+}
+
 export async function fetchTodos() {
   const res = await fetch(`${API_BASE}/todos`)
   if (!res.ok) throw new Error('Failed to load todos')

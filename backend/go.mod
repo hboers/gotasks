@@ -1,10 +1,11 @@
 module example.com/todo-backend
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/redis/go-redis/v9 v9.17.0
+	golang.org/x/crypto v0.45.0
 )
 
 require (
