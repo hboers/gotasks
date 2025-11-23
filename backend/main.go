@@ -2,34 +2,41 @@ package main
 
 import (
     "net/http"
-    "github.com/gin-gonic/gin"
-	"example.com/todo-backend/objects/tasks"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"example.com/todo-backend/objects"
 )
 
-
 func main() {
-    r := gin.Default()
 
-    // CORS – simple/naive version for local dev
-    r.Use(func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        if c.Request.Method == http.MethodOptions {
-            c.AbortWithStatus(204)
-            return
-        }
-        c.Next()
+    r := chi.NewRouter()
+
+    r.Use(middleware.Logger)
+    r.Use(middleware.Recoverer)
+
+    // CORS middleware
+    r.Use(func(next http.Handler) http.Handler {
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            w.Header().Set("Access-Control-Allow-Origin", "*")
+            w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+            w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
+            if r.Method == http.MethodOptions {
+                w.WriteHeader(204)
+                return
+            }
+
+            next.ServeHTTP(w, r)
+        })
     })
 
-    api := r.Group("/api")
-    {
-        api.GET("/todos", tasks.Get)
-        api.POST("/todos", tasks.Create)
-        api.PUT("/todos/:id", tasks.Update)
-        api.DELETE("/todos/:id", tasks.Delete)
-    }
+    // Routes (same structure as before)
+    r.Route("/api", func(api chi.Router) {
+        api.Get("/todos", tasks.Get)
+        api.Post("/todos", tasks.Create)
+        api.Put("/todos/{id}", tasks.Update)     
+        api.Delete("/todos/{id}", tasks.Delete)
+    })
 
-    r.Run(":8080") // http://localhost:8080
+    http.ListenAndServe(":8080", r)
 }
-
