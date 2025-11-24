@@ -1,12 +1,13 @@
 package main
 
 import (
-	"net/http"
+    "net/http"
 
-	"example.com/todo-backend/objects/tasks"
-	"example.com/todo-backend/objects/users"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+    "example.com/todo-backend/objects/tasks"
+    "example.com/todo-backend/objects/users"
+
+    "github.com/go-chi/chi/v5"
+    "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -34,15 +35,19 @@ func main() {
 
 	// Routes (same structure as before)
 	r.Route("/api", func(api chi.Router) {
+    // Auth
+    api.Post("/register", users.Register)
+    api.Post("/login", users.Login)
+    api.Post("/logout", users.Logout)
 
-		api.Post("/login", users.Login)
-		api.Post("/register", users.Register)
-
-		api.Get("/todos", tasks.Get)
-		api.Post("/todos", tasks.Create)
-		api.Put("/todos/{id}", tasks.Update)
-		api.Delete("/todos/{id}", tasks.Delete)
-	})
-
+    // geschützte Routen
+    api.Group(func(priv chi.Router) {
+        priv.Use(users.RequireAuth)
+        priv.Get("/todos", tasks.Get)
+        priv.Post("/todos", tasks.Create)
+        priv.Put("/todos/{id}", tasks.Update)
+        priv.Delete("/todos/{id}", tasks.Delete)
+    })
+})
 	http.ListenAndServe(":8080", r)
 }

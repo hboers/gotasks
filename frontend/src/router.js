@@ -2,12 +2,14 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import LoginView from "./views/LoginView.vue";
 import RegisterView from "./views/RegisterView.vue";
+import DashboardView from "./views/DashboardView.vue";
 import TodoView from "./views/TodoView.vue";
 
 const routes = [
-  { path: "/", component: LoginView },
-  { path: "/register", component: RegisterView },
-  { path: "/todos", component: TodoView },
+  { path: "/login",  component: LoginView },
+  { path: "/todos",  component: TodoView },
+  { path: "/register",  component: RegisterView },
+  { path: "/", component: DashboardView },
 ];
 
 export const router = createRouter({

@@ -19,18 +19,24 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { fetchTodos, createTodo } from "../api";
+import { useRouter } from "vue-router";
+import { fetchTodos } from "../api";
 
+const router = useRouter();
 const todos = ref([]);
-const newTodo = ref("");
+const error = ref("");
+const newTodo = ref("");   
 
 onMounted(async () => {
-  todos.value = await fetchTodos();
+  try {
+    todos.value = await fetchTodos();
+  } catch (e) {
+    console.log("fetchTodos error:", e, "status:", e.status); // debug
+    if (e.status === 401) {
+      await router.push("/login");
+      return;
+    }
+    error.value = e.message || "Failed to load todos";
+  }
 });
-
-async function addTodo() {
-  const todo = await createTodo(newTodo.value);
-  todos.value.push(todo);
-  newTodo.value = "";
-}
 </script>

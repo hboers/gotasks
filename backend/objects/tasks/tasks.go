@@ -3,9 +3,11 @@ package tasks
 import (
     "context"
     "encoding/json"
+    "log"
     "net/http"
     "os"
     "strconv"
+    "example.com/todo-backend/objects/users"
 
     "github.com/go-chi/chi/v5"
     "github.com/redis/go-redis/v9"
@@ -44,6 +46,9 @@ type Todo struct {
 
 // GET /api/todos
 func Get(w http.ResponseWriter, r *http.Request) {
+    
+    log.Println("Current user: %v",users.CurrentUser)
+
     ids, err := rdb.SMembers(ctx, "todos").Result()
     if err != nil {
         http.Error(w, "redis error: "+err.Error(), http.StatusInternalServerError)

@@ -30,7 +30,11 @@ export async function login(email, password) {
 
 export async function fetchTodos() {
   const res = await fetch(`${API_BASE}/todos`)
-  if (!res.ok) throw new Error('Failed to load todos')
+  if (!res.ok) {
+    const err = new Error('Failed to load todos')
+    err.status = res.status
+    throw  err
+  }
   return res.json()
 }
 
