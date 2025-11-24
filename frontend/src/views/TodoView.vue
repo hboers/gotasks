@@ -1,8 +1,6 @@
 <template>
-  <div>
+  <div class="container mt-3">
     <h1>Todos</h1>
-
-    <router-link to="/">Logout</router-link>
 
     <ul>
       <li v-for="t in todos" :key="t.id">

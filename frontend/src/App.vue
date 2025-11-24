@@ -15,9 +15,6 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <template v-if="user">
         <li class="nav-item">
-          <router-link class="nav-link" to="/">Dashboard</router-link> 
-        </li>
-        <li class="nav-item">
           <router-link class="nav-link" to="/todos">Todos</router-link> 
         </li>
         </template>
@@ -28,16 +25,7 @@
         </template>
       </ul>
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <template v-if="!user">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/login">Login</router-link>
-          </li>
-
-          <li class="nav-item">
-            <router-link class="nav-link" to="/register">Register</router-link>
-          </li>
-        </template>
-        <template v-else>
+        <template v-if="user">
           <li class="nav-item">
             <span class="nav-link disabled">
               <i class="bi bi-person-circle"></i>
@@ -50,9 +38,7 @@
         </template>
       </ul>
   </nav>
-  <div class="container mt-4">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 <script setup>
   import { computed } from "vue";
