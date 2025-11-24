@@ -37,6 +37,12 @@
           />
           {{ t.title }}
         </span>
+      <button
+      class="btn btn-sm btn-outline-danger"
+      @click="onDelete(t)"
+    >
+      <i class="bi bi-trash"></i>
+    </button>
       </li>
     </ul>
   </div>
@@ -44,7 +50,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue"
-import { fetchTodos, createTodo, updateTodo } from "../api"
+import { fetchTodos, createTodo, updateTodo, deleteTodo } from "../api"
 
 const todos = ref([])
 const newTodo = ref("")
@@ -81,5 +87,19 @@ async function addTodo() {
 async function toggleTodo(todo) {
   updateTodo(todo.id, !todo.done) 
   todo.done = !todo.done
+}
+async function onDelete(todo) {
+  if (!confirm(`Todo "${todo.title}" wirklich löschen?`)) {
+    return;
+  }
+
+  try {
+    await deleteTodo(todo.id);
+
+    // Sofort aus der Liste entfernen
+    todos.value = todos.value.filter(t => t.id !== todo.id);
+  } catch (e) {
+    error.value = e.message || "Fehler beim Löschen";
+  }
 }
 </script>

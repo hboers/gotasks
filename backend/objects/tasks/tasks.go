@@ -37,13 +37,7 @@ type Todo struct {
     ID    int64     `json:"id"`
     Title string    `json:"title"`
     Done  bool      `json:"done"`
-    OwnerId  int64  `json:"owner_id"`
 }
-
-// Redis keys:
-// todo:id        -> counter (INCR)
-// todo:<id>      -> JSON of Todo
-// todos          -> set of all IDs
 
 // GET /api/todos
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +79,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
     var input struct {
         Title string `json:"title"`
     }
-
+    u, err := users.CurrentUser(r)
+    if err != nil || u == nil {
+        http.Error(w, "unauthorized", http.StatusUnauthorized)
+        return
+    }
     if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
         http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
         return
@@ -106,7 +104,6 @@ func Create(w http.ResponseWriter, r *http.Request) {
         ID:    id,
         Title: input.Title,
         Done:  false,
-        OwnerId:  0,
     }
 
     data, err := json.Marshal(todo)
@@ -115,7 +112,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    key := "todo:" + strconv.FormatInt(id, 10)
+    key := "user:"+ strconv.FormatInt(u.ID, 10)+":todo:" + strconv.FormatInt(id, 10)
 
     // store todo and add to set
     if err := rdb.Set(ctx, key, data, 0).Err(); err != nil {
@@ -173,9 +170,6 @@ func Update(w http.ResponseWriter, r *http.Request) {
     }
     if patch.Done != nil {
         todo.Done = *patch.Done
-    }
-     if patch.OwnerId != nil {
-        todo.OwnerId = *patch.OwnerId
     }
 
     data, err = json.Marshal(todo)
