@@ -21,6 +21,6 @@ const password = ref("");
 
 async function doLogin() {
   await login(email.value, password.value);
-  location.href = "/todos"; // navigation
+  location.href = "/"; // navigation
 }
 </script>

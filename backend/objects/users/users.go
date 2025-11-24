@@ -244,7 +244,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   false,                 // in Produktion: true + HTTPS
-		SameSite: http.SameSiteNoneMode, // wichtig für Vite-Frontend auf anderem Origin
+		//SameSite: http.SameSiteNoneMode, // wichtig für Vite-Frontend auf anderem Origin
 	})
 
 	w.Header().Set("Content-Type", "application/json")
@@ -340,8 +340,23 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   false,
-		SameSite: http.SameSiteNoneMode,
+		// SameSite: http.SameSiteNoneMode,
 	})
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func Me(w http.ResponseWriter, r *http.Request) {
+    u, err := CurrentUser(r)
+    if err != nil || u == nil {
+        http.Error(w, "unauthorized", http.StatusUnauthorized)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]any{
+        "id":    u.ID,
+        "email": u.Email,
+        "name":  u.Name,
+    })
 }

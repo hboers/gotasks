@@ -5,31 +5,52 @@ export async function register(email, name, password) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, name, password }),
-  });
+  })
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await res.text())
   }
 
-  return res.json(); // { id, email, name }
+  return res.json() // { id, email, name }
 }
 
 export async function login(email, password) {
   const res = await fetch(`${API_BASE}/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    credentials: "include",              // 🔥 Cookie senden & akzeptieren
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ email, password }),
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    const text = await res.text();
+    const err = new Error(text || "Login failed");
+    err.status = res.status;
+    throw err;
   }
 
-  return res.json(); // { status:"ok", user:{...} }
+  return res.json();
+}
+
+export async function fetchMe() {
+  const res = await fetch(`${API_BASE}/me`, {
+    credentials: "include"  
+  })
+
+  if (!res.ok) {
+    const err = new Error("Unauthorized")
+    err.status = res.status
+    throw err
+  }
+  return res.json() // { id, email, name }
 }
 
 export async function fetchTodos() {
-  const res = await fetch(`${API_BASE}/todos`)
+  const res = await fetch(`${API_BASE}/todos`,{
+    credentials: "include"  
+  }) 
   if (!res.ok) {
     const err = new Error('Failed to load todos')
     err.status = res.status

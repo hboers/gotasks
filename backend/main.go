@@ -20,8 +20,9 @@ func main() {
 	// CORS middleware
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
 			if r.Method == http.MethodOptions {
@@ -39,14 +40,19 @@ func main() {
     api.Post("/register", users.Register)
     api.Post("/login", users.Login)
     api.Post("/logout", users.Logout)
+ 	api.Get("/me", users.Me)
 
     // geschützte Routen
     api.Group(func(priv chi.Router) {
-        priv.Use(users.RequireAuth)
+        
+		priv.Use(users.RequireAuth)
+		
         priv.Get("/todos", tasks.Get)
         priv.Post("/todos", tasks.Create)
         priv.Put("/todos/{id}", tasks.Update)
         priv.Delete("/todos/{id}", tasks.Delete)
+
+
     })
 })
 	http.ListenAndServe(":8080", r)
