@@ -63,25 +63,37 @@ export async function createTodo(title) {
   const res = await fetch(`${API_BASE}/todos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title })
+    body: JSON.stringify({ title }),
+    credentials: "include"  
   })
   if (!res.ok) throw new Error('Failed to create todo')
   return res.json()
 }
 
-export async function updateTodo(id, patch) {
+export async function updateTodo(id, done) {
   const res = await fetch(`${API_BASE}/todos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(patch)
-  })
-  if (!res.ok) throw new Error('Failed to update todo')
-  return res.json()
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ done }),
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    const err = new Error(t);
+    err.status = res.status;
+    throw err;
+  }
+
+  return res.json();
 }
 
 export async function deleteTodo(id) {
   const res = await fetch(`${API_BASE}/todos/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    credentials: "include"  
   })
   if (!res.ok && res.status !== 204) {
     throw new Error('Failed to delete todo')

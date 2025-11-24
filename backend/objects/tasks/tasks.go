@@ -34,9 +34,10 @@ func init() {
 }
 
 type Todo struct {
-    ID    int64  `json:"id"`
-    Title string `json:"title"`
-    Done  bool   `json:"done"`
+    ID    int64     `json:"id"`
+    Title string    `json:"title"`
+    Done  bool      `json:"done"`
+    OwnerId  int64  `json:"owner_id"`
 }
 
 // Redis keys:
@@ -105,6 +106,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
         ID:    id,
         Title: input.Title,
         Done:  false,
+        OwnerId:  0,
     }
 
     data, err := json.Marshal(todo)
@@ -158,6 +160,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
     var patch struct {
         Title *string `json:"title"`
         Done  *bool   `json:"done"`
+        OwnerId  *int64  `json:"owner_id"`
     }
 
     if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
@@ -170,6 +173,9 @@ func Update(w http.ResponseWriter, r *http.Request) {
     }
     if patch.Done != nil {
         todo.Done = *patch.Done
+    }
+     if patch.OwnerId != nil {
+        todo.OwnerId = *patch.OwnerId
     }
 
     data, err = json.Marshal(todo)
