@@ -3,7 +3,6 @@ package tasks
 import (
     "context"
     "encoding/json"
-    "log"
     "net/http"
     "os"
     "strconv"
@@ -42,8 +41,6 @@ type Todo struct {
 // GET /api/todos
 func Get(w http.ResponseWriter, r *http.Request) {
     
-    log.Println("Current user: %v",users.CurrentUser)
-
     ids, err := rdb.SMembers(ctx, "todos").Result()
     if err != nil {
         http.Error(w, "redis error: "+err.Error(), http.StatusInternalServerError)
